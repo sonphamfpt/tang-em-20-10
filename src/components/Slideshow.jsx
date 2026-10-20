@@ -4,6 +4,16 @@ import s from './Slideshow.module.css';
 /* Progress bar auto-advances after SLIDE_DUR ms */
 const SLIDE_DUR = 5500;
 
+function resolveAsset(url) {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:') || url.startsWith('data:')) {
+    return url;
+  }
+  const base = import.meta.env.BASE_URL || './';
+  const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
+  return base.endsWith('/') ? `${base}${cleanUrl}` : `${base}/${cleanUrl}`;
+}
+
 export default function Slideshow({ photos, onNext }) {
   const [slides, setSlides]         = useState(photos);
   const [cur, setCur]               = useState(0);
@@ -12,9 +22,13 @@ export default function Slideshow({ photos, onNext }) {
   const [progress, setProgress]     = useState(0);
   const [captionIn, setCaptionIn]   = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
-  const progressRef = useRef(null);
   const startRef    = useRef(null);
   const rafRef      = useRef(null);
+
+  // Sync slides if photos prop changes
+  useEffect(() => {
+    setSlides(photos);
+  }, [photos]);
 
   // Animate progress bar
   const startProgress = () => {
@@ -52,7 +66,10 @@ export default function Slideshow({ photos, onNext }) {
     setCaptionIn(false);
     const t = setTimeout(() => setCaptionIn(true), 600);
     startProgress();
-    return () => { cancelAnimationFrame(rafRef.current); clearTimeout(t); };
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      clearTimeout(t);
+    };
   }, [cur, slides.length]);
 
   // Photo upload
@@ -63,37 +80,39 @@ export default function Slideshow({ photos, onNext }) {
       src:     URL.createObjectURL(f),
       caption: f.name.replace(/\.[^/.]+$/, ''),
     }));
-    setSlides(prev => [...newSlides, ...prev]);
+    setSlides(prevSlides => [...newSlides, ...prevSlides]);
     setCur(0);
     setPrev(null);
     setUploadOpen(false);
   };
 
   const isLast = cur === slides.length - 1;
-  const slide  = slides[cur];
+  const slide  = slides[cur] || slides[0];
 
   return (
     <div className={s.root}>
 
       {/* ── Background image layer (previous, exiting) ── */}
-      {prev !== null && (
+      {prev !== null && slides[prev] && (
         <div
           key={`prev-${prev}`}
           className={`${s.imgLayer} ${dir === 1 ? s.exitLeft : s.exitRight}`}
         >
-          <img src={slides[prev].src} alt="" className={s.img} />
+          <img src={resolveAsset(slides[prev].src)} alt="" className={s.img} />
           <div className={s.imgScrim} />
         </div>
       )}
 
       {/* ── Background image layer (current, entering) ── */}
-      <div
-        key={`cur-${cur}`}
-        className={`${s.imgLayer} ${prev !== null ? (dir === 1 ? s.enterRight : s.enterLeft) : s.enterFirst}`}
-      >
-        <img src={slide.src} alt={slide.caption} className={s.img} />
-        <div className={s.imgScrim} />
-      </div>
+      {slide && (
+        <div
+          key={`cur-${cur}`}
+          className={`${s.imgLayer} ${prev !== null ? (dir === 1 ? s.enterRight : s.enterLeft) : s.enterFirst}`}
+        >
+          <img src={resolveAsset(slide.src)} alt={slide.caption} className={s.img} />
+          <div className={s.imgScrim} />
+        </div>
+      )}
 
       {/* ── Progress bars ── */}
       <div className={s.progressBar}>
@@ -114,10 +133,12 @@ export default function Slideshow({ photos, onNext }) {
       </button>
 
       {/* ── Caption ── */}
-      <div className={`${s.caption} ${captionIn ? s.captionIn : ''}`}>
-        <p className={s.captionText}>{slide.caption}</p>
-        <span className={s.captionSlideNum}>{cur + 1} / {slides.length}</span>
-      </div>
+      {slide && (
+        <div className={`${s.caption} ${captionIn ? s.captionIn : ''}`}>
+          <p className={s.captionText}>{slide.caption}</p>
+          <span className={s.captionSlideNum}>{cur + 1} / {slides.length}</span>
+        </div>
+      )}
 
       {/* ── Nav tap zones ── */}
       <button className={`${s.tapZone} ${s.tapLeft}`}  onClick={() => advance(-1)} aria-label="Ảnh trước" />
