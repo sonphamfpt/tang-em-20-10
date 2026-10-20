@@ -1,0 +1,319 @@
+.root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(175deg, #100912 0%, #0d0710 50%, #100912 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ambient top glow */
+.topGlow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(194,64,90,0.18) 0%, transparent 70%);
+  filter: blur(50px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Scrollable wrapper */
+.scrollWrap {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  z-index: 2;
+}
+.scrollWrap::-webkit-scrollbar { display: none; }
+
+/* Content */
+.inner {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 60px 28px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s var(--ease-expo), transform 1s var(--ease-expo);
+}
+.visible { opacity: 1; transform: none; }
+
+/* ── Header ───────────────────────────────────────── */
+.header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.eyebrow {
+  font-family: var(--ff-sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  opacity: 0.7;
+}
+
+.name {
+  font-family: var(--ff-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(42px, 12vw, 58px);
+  background: linear-gradient(160deg, #f0e0d0 20%, #e8b0bc 60%, #c2405a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.05;
+}
+
+.ornamentRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 140px;
+  margin-top: 2px;
+}
+.ornLine {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(200,169,126,0.4), transparent);
+}
+.orn {
+  color: var(--gold);
+  font-size: 13px;
+  opacity: 0.55;
+}
+
+/* ── Counter ──────────────────────────────────────── */
+.counter {
+  text-align: center;
+}
+
+.counterLabel {
+  font-family: var(--ff-serif);
+  font-style: italic;
+  font-size: 15px;
+  font-weight: 300;
+  color: rgba(240,220,210,0.5);
+  margin-bottom: 14px;
+}
+
+.counterGrid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 8px;
+}
+
+.counterCell {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 12px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.counterNum {
+  font-family: var(--ff-serif);
+  font-size: 28px;
+  font-weight: 300;
+  color: #f0e0d0;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
+}
+
+.counterUnit {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(200,169,126,0.5);
+}
+
+/* ── Letter card ─────────────────────────────────── */
+.letterCard {
+  background: var(--cream);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.45),
+    0 0  0 1px rgba(200,169,126,0.2);
+  position: relative;
+}
+
+/* Torn-paper top edge effect */
+.letterCard::before {
+  content: '';
+  display: block;
+  height: 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--cream) 0px, var(--cream) 4px,
+    var(--ink) 4px, var(--ink) 5px
+  );
+  opacity: 0.07;
+}
+
+.letterInner {
+  padding: 32px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 180px;
+}
+
+.para {
+  font-family: var(--ff-serif);
+  font-size: clamp(16px, 4vw, 19px);
+  font-weight: 300;
+  color: #2c1a22;
+  line-height: 1.85;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.para:first-of-type::first-letter {
+  float: left;
+  font-size: 3.5em;
+  line-height: 0.75;
+  margin: 4px 6px 0 0;
+  color: var(--rose);
+  font-family: var(--ff-serif);
+  font-weight: 400;
+}
+
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 0.9em;
+  background: var(--rose);
+  vertical-align: middle;
+  margin-left: 2px;
+  border-radius: 1px;
+  animation: blink .75s step-end infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+.signature {
+  padding: 18px 28px 28px;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.sigRule {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #c2b4a8);
+  margin-bottom: 10px;
+}
+
+.sigFrom {
+  font-family: var(--ff-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-warm);
+}
+
+.sigName {
+  font-family: var(--ff-script);
+  font-size: 32px;
+  color: var(--rose);
+  line-height: 1.1;
+}
+
+/* ── Heart section ────────────────────────────────── */
+.heartSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.heartBtn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(194,64,90,0.1);
+  border: 1px solid rgba(194,64,90,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: var(--rose-light);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s var(--ease-spring), box-shadow 0.2s;
+}
+
+.heartBtn:hover {
+  background: rgba(194,64,90,0.2);
+  box-shadow: 0 0 24px rgba(194,64,90,0.3);
+}
+
+.heartBtn:active {
+  transform: scale(0.88);
+}
+
+.heartIcon {
+  display: block;
+  animation: heartbeat 2.2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.15); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.1); }
+  70%       { transform: scale(1); }
+}
+
+.heartNote {
+  font-family: var(--ff-serif);
+  font-style: italic;
+  font-size: 14px;
+  color: rgba(240,200,210,0.55);
+  text-align: center;
+  animation: fadeInNote 0.5s ease;
+}
+
+@keyframes fadeInNote { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+
+/* ── Restart ──────────────────────────────────────── */
+.restartRow { display: flex; justify-content: center; }
+
+.restartBtn {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 6px 12px;
+}
+
+.restartBtn:hover { color: rgba(255,255,255,0.5); }
+
+/* ── Bottom ornament ──────────────────────────────── */
+.bottomOrnament {
+  text-align: center;
+  font-family: var(--ff-sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  color: rgba(200,169,126,0.25);
+}

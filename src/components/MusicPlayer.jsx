@@ -1,66 +1,128 @@
-import { useState, useEffect } from 'react';
-import styles from './MusicPlayer.module.css';
+import { useState, useEffect, useRef } from 'react';
+import s from './MusicPlayer.module.css';
 
-let audioCtx = null;
-let interval = null;
-const NOTE_SEQ = [
-  587.33, 493.88, 440.00, 369.99,
-  392.00, 440.00, 493.88, 587.33,
-  659.25, 587.33, 523.25, 493.88,
-  440.00, 523.25, 587.33, 659.25,
+// Romantic music box melody (D major pentatonic / warm ballad)
+const MELODY = [
+  // bar 1
+  { f: 587.33, d: 500 }, // D5
+  { f: 493.88, d: 500 }, // B4
+  { f: 440.00, d: 500 }, // A4
+  { f: 369.99, d: 500 }, // F#4
+  // bar 2
+  { f: 392.00, d: 500 }, // G4
+  { f: 440.00, d: 500 }, // A4
+  { f: 493.88, d: 500 }, // B4
+  { f: 587.33, d: 750 }, // D5
+  // bar 3
+  { f: 659.25, d: 500 }, // E5
+  { f: 587.33, d: 500 }, // D5
+  { f: 523.25, d: 500 }, // C5
+  { f: 493.88, d: 500 }, // B4
+  // bar 4
+  { f: 440.00, d: 500 }, // A4
+  { f: 523.25, d: 500 }, // C5
+  { f: 587.33, d: 500 }, // D5
+  { f: 659.25, d: 850 }, // E5
 ];
-let noteIdx = 0;
 
-function playNote(freq) {
-  if (!audioCtx) return;
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-  const now = audioCtx.currentTime;
-  const osc  = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-  const filt = audioCtx.createBiquadFilter();
-  filt.type = 'lowpass';
-  filt.frequency.value = 1200;
-  osc.type = 'sine';
-  osc.frequency.value = freq;
-  gain.gain.setValueAtTime(0, now);
-  gain.gain.linearRampToValueAtTime(0.12, now + 0.05);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
-  osc.connect(filt); filt.connect(gain); gain.connect(audioCtx.destination);
-  osc.start(now); osc.stop(now + 1.7);
-}
+export default function MusicPlayer({ musicUrl, playing, onToggle }) {
+  const audioRef    = useRef(null);
+  const audioCtxRef = useRef(null);
+  const timerRef    = useRef(null);
+  const noteIdxRef  = useRef(0);
 
-export default function MusicPlayer() {
-  const [playing, setPlaying] = useState(false);
+  // Play synthesized chime note
+  const playChime = (freq) => {
+    try {
+      const ctx = audioCtxRef.current;
+      if (!ctx) return;
+      if (ctx.state === 'suspended') ctx.resume();
 
-  const toggle = () => {
-    if (playing) {
-      clearInterval(interval);
-      interval = null;
-      setPlaying(false);
-    } else {
-      if (!audioCtx) {
-        const AC = window.AudioContext || window.webkitAudioContext;
-        if (AC) audioCtx = new AC();
-      }
-      interval = setInterval(() => {
-        playNote(NOTE_SEQ[noteIdx % NOTE_SEQ.length]);
-        noteIdx++;
-      }, 520);
-      setPlaying(true);
+      const now  = ctx.currentTime;
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const filt = ctx.createBiquadFilter();
+
+      // Soft bell / music box timbre
+      filt.type = 'lowpass';
+      filt.frequency.value = 1600;
+      filt.Q.value = 3;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.08, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.8);
+
+      osc.connect(filt);
+      filt.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 1.9);
+    } catch {
+      // AudioContext silently handled
     }
   };
 
-  // Stop on unmount
-  useEffect(() => () => { clearInterval(interval); }, []);
+  const scheduleNextNote = () => {
+    if (!audioCtxRef.current) return;
+    const note = MELODY[noteIdxRef.current % MELODY.length];
+    playChime(note.f);
+    noteIdxRef.current = (noteIdxRef.current + 1) % MELODY.length;
+    timerRef.current = setTimeout(scheduleNextNote, note.d);
+  };
+
+  // Handle Play / Stop
+  useEffect(() => {
+    if (playing) {
+      if (musicUrl) {
+        if (!audioRef.current) {
+          audioRef.current = new Audio(musicUrl);
+          audioRef.current.loop = true;
+        }
+        audioRef.current.play().catch(() => {});
+      } else {
+        if (!audioCtxRef.current) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (AC) audioCtxRef.current = new AC();
+        }
+        if (audioCtxRef.current && audioCtxRef.current.state === 'suspended') {
+          audioCtxRef.current.resume();
+        }
+        scheduleNextNote();
+      }
+    } else {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [playing, musicUrl]);
 
   return (
-    <button
-      className={`${styles.btn} ${playing ? styles.active : ''}`}
-      onClick={toggle}
-      aria-label={playing ? 'Tắt nhạc' : 'Bật nhạc'}
-    >
-      <span className={`${styles.disc} ${playing ? styles.spin : ''}`}>🎵</span>
-      <span className={styles.label}>{playing ? 'Đang phát' : 'Phát nhạc'}</span>
-    </button>
+    <div className={s.wrapper}>
+      <button
+        className={`${s.btn} ${playing ? s.active : ''}`}
+        onClick={onToggle}
+        aria-label={playing ? 'Tắt nhạc' : 'Bật nhạc'}
+        title={playing ? 'Tắt nhạc nền' : 'Bật nhạc nền'}
+      >
+        <div className={s.eq}>
+          <span className={s.bar} />
+          <span className={s.bar} />
+          <span className={s.bar} />
+        </div>
+        <span className={s.label}>{playing ? 'Nhạc nền' : 'Bật nhạc'}</span>
+      </button>
+    </div>
   );
 }

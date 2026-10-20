@@ -1,63 +1,89 @@
-import { useState, useEffect } from 'react';
-import { config } from './config';
-import ParticleCanvas from './components/ParticleCanvas';
-import MusicPlayer from './components/MusicPlayer';
-import PhotoSlideshow from './components/PhotoSlideshow';
-import LoveLetter from './components/LoveLetter';
-import Vouchers from './components/Vouchers';
+import { useState, useRef, useCallback } from 'react';
+import { config }    from './config';
+import Particles     from './components/Particles';
+import MusicPlayer   from './components/MusicPlayer';
+import Intro         from './components/Intro';
+import Slideshow     from './components/Slideshow';
+import Letter        from './components/Letter';
 
-// Steps: 0 = slideshow, 1 = letter, 2 = vouchers
+const STEPS = ['intro', 'slideshow', 'letter'];
+
 export default function App() {
-  const [step, setStep] = useState(0);
-  const [transitioning, setTransitioning] = useState(false);
+  const [step, setStep]           = useState(0);
+  const [leaving, setLeaving]     = useState(false);
+  const [entering, setEntering]   = useState(false);
+  const [musicPlaying, setMusicPlaying] = useState(false);
+  const nextStepRef               = useRef(0);
 
-  const goTo = (next) => {
-    setTransitioning(true);
+  /* Orchestrate page transition */
+  const goTo = useCallback((next) => {
+    if (leaving || entering) return;
+    nextStepRef.current = next;
+    setLeaving(true);              // trigger exit animation
+
+    // After exit completes, swap the page
     setTimeout(() => {
+      setLeaving(false);
       setStep(next);
-      setTransitioning(false);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 350);
-  };
+      setEntering(true);           // trigger enter animation
+
+      // Clean up enter class
+      setTimeout(() => setEntering(false), 900);
+    }, 580);
+  }, [leaving, entering]);
+
+  const advance = useCallback(() => {
+    // When transitioning from intro or anytime user advances, start music if not playing
+    if (!musicPlaying) setMusicPlaying(true);
+    goTo(Math.min(step + 1, STEPS.length - 1));
+  }, [step, goTo, musicPlaying]);
+
+  const restart = useCallback(() => goTo(0), [goTo]);
+
+  const pageClass = [
+    'page',
+    leaving  ? 'page-exit'  : '',
+    entering ? 'page-enter' : '',
+  ].filter(Boolean).join(' ');
 
   return (
-    <>
-      <div className="app-bg" />
-      <ParticleCanvas />
-      <MusicPlayer />
+    <div className="grain">
+      {/* Ambient floating particles — always present */}
+      <Particles />
 
-      <main
-        className="app-shell"
-        style={{
-          opacity: transitioning ? 0 : 1,
-          transform: transitioning ? 'translateY(14px)' : 'translateY(0)',
-          transition: 'opacity .35s ease, transform .35s ease',
-        }}
-      >
+      {/* Floating music toggle */}
+      <MusicPlayer
+        musicUrl={config.musicUrl}
+        playing={musicPlaying}
+        onToggle={() => setMusicPlaying(p => !p)}
+      />
+
+      {/* ── Active page ── */}
+      <div className={pageClass} style={{ zIndex: 10 }}>
         {step === 0 && (
-          <PhotoSlideshow
-            photos={config.photos}
-            onFinish={() => goTo(1)}
+          <Intro
+            recipientName={config.recipientName}
+            onNext={advance}
           />
         )}
 
         {step === 1 && (
-          <LoveLetter
-            letter={config.letter}
-            senderName={config.senderName}
-            recipientName={config.recipientName}
-            startDate={config.startDate}
-            onFinish={() => goTo(2)}
+          <Slideshow
+            photos={config.photos}
+            onNext={advance}
           />
         )}
 
         {step === 2 && (
-          <Vouchers
-            vouchers={config.vouchers}
-            onRestart={() => goTo(0)}
+          <Letter
+            letter={config.letter}
+            senderName={config.senderName}
+            recipientName={config.recipientName}
+            startDate={config.startDate}
+            onRestart={restart}
           />
         )}
-      </main>
-    </>
+      </div>
+    </div>
   );
 }

@@ -1,0 +1,309 @@
+/* Full-screen stage */
+.root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #0c0810;
+  overflow: hidden;
+}
+
+/* ── Image layers ─────────────────────────────────── */
+.imgLayer {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.72) saturate(1.1);
+  transform-origin: center;
+}
+
+/* Ken-Burns zoom on the entering image */
+@keyframes kenBurns {
+  from { transform: scale(1.08); }
+  to   { transform: scale(1.0); }
+}
+
+.enterFirst .img,
+.enterRight .img,
+.enterLeft  .img {
+  animation: kenBurns 6s var(--ease-silk) forwards;
+}
+
+/* Slide transitions */
+@keyframes slideInRight  { from { transform: translateX(6%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slideInLeft   { from { transform: translateX(-6%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slideOutLeft  { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-4%); opacity: 0; } }
+@keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(4%); opacity: 0; } }
+
+.enterFirst { animation: fadeInLayer 1.2s var(--ease-silk) forwards; }
+.enterRight { animation: slideInRight 0.75s var(--ease-expo) forwards; z-index: 2; }
+.enterLeft  { animation: slideInLeft  0.75s var(--ease-expo) forwards; z-index: 2; }
+.exitLeft   { animation: slideOutLeft  0.75s var(--ease-silk) forwards; z-index: 1; }
+.exitRight  { animation: slideOutRight 0.75s var(--ease-silk) forwards; z-index: 1; }
+
+@keyframes fadeInLayer { from { opacity: 0; } to { opacity: 1; } }
+
+/* Multi-directional scrim */
+.imgScrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom,
+      rgba(12,8,16,0.65) 0%,
+      rgba(12,8,16,0.1)  25%,
+      rgba(12,8,16,0.1)  60%,
+      rgba(12,8,16,0.85) 100%);
+}
+
+/* ── Progress bars ────────────────────────────────── */
+.progressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  gap: 4px;
+  padding: 14px 16px 0;
+}
+
+.barTrack {
+  flex: 1;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.2);
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: #fff;
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+/* ── Upload button ─────────────────────────────────── */
+.uploadBtn {
+  position: absolute;
+  top: 30px;
+  left: 16px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  background: rgba(0,0,0,0.38);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 20px;
+  color: rgba(255,255,255,0.75);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.uploadBtn:hover { background: rgba(0,0,0,0.6); }
+
+.uploadIcon {
+  font-size: 15px;
+  line-height: 1;
+  color: var(--rose-pale);
+}
+
+.uploadLabel { }
+
+/* ── Caption ──────────────────────────────────────── */
+.caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding: 32px 24px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.8s var(--ease-expo), transform 0.8s var(--ease-expo);
+}
+
+.captionIn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.captionText {
+  font-family: var(--ff-serif);
+  font-style: italic;
+  font-size: clamp(20px, 5.5vw, 28px);
+  font-weight: 300;
+  color: #fff;
+  line-height: 1.3;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+  max-width: 300px;
+}
+
+.captionSlideNum {
+  font-family: var(--ff-sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.4);
+}
+
+/* ── Invisible tap zones ──────────────────────────── */
+.tapZone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 15;
+  width: 35%;
+  cursor: pointer;
+  background: none;
+}
+
+.tapLeft  { left: 0; }
+.tapRight { right: 0; }
+
+/* ── Visual arrow hints ───────────────────────────── */
+.arrows {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 16;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 12px;
+  pointer-events: none;
+}
+
+.arrowChevron {
+  font-size: 32px;
+  color: rgba(255,255,255,0.25);
+  font-weight: 300;
+  line-height: 1;
+  animation: breathe 3s ease-in-out infinite;
+}
+
+.arrowL { animation-delay: 0.5s; }
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.2; }
+  50%       { opacity: 0.45; }
+}
+
+/* ── "Đọc thư" bottom CTA (last slide) ──────────── */
+.nextCta {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 26px;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 30px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  animation: riseUp 0.7s var(--ease-spring) forwards;
+  white-space: nowrap;
+}
+
+@keyframes riseUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.nextCta:active { transform: translateX(-50%) scale(0.96); }
+
+.nextArrow {
+  font-size: 14px;
+  color: var(--rose-pale);
+  animation: floatArrow 2s ease-in-out infinite;
+}
+
+@keyframes floatArrow {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(3px); }
+}
+
+/* ── Upload Panel Overlay ─────────────────────────── */
+.uploadOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: rgba(12,8,16,0.88);
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.uploadPanel {
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.uploadTitle {
+  font-family: var(--ff-serif);
+  font-style: italic;
+  font-size: 26px;
+  font-weight: 300;
+  color: #fff;
+}
+
+.uploadSub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+}
+
+.uploadLbl {
+  padding: 14px 36px;
+  border-radius: 30px;
+  border: 1px solid rgba(194,64,90,0.5);
+  background: rgba(194,64,90,0.15);
+  color: var(--rose-pale);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.uploadLbl:hover { background: rgba(194,64,90,0.3); }
+
+.uploadCancel {
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.uploadCancel:hover { color: rgba(255,255,255,0.65); }
