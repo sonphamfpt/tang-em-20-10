@@ -65,13 +65,10 @@ export default function Letter({
   senderName,
   recipientName,
   startDate,
-  replyLink,
-  replyMessage,
   onRestart,
 }) {
   const [phase, setPhase]           = useState('hidden'); // hidden → visible
   const [heartCount, setHeartCount] = useState(0);
-  const [copiedToast, setCopiedToast] = useState(false);
   const counter = useCounter(startDate);
   const { para, done } = useTypewriter(letter, phase === 'visible');
 
@@ -118,14 +115,7 @@ export default function Letter({
     triggerFireworks(x, y);
   };
 
-  // Reply handler: copy message + open link
-  const handleReplyClick = (e) => {
-    if (navigator.clipboard && replyMessage) {
-      navigator.clipboard.writeText(replyMessage).catch(() => {});
-    }
-    setCopiedToast(true);
-    setTimeout(() => setCopiedToast(false), 3500);
-  };
+
 
   // Inject heart firework keyframe once
   useEffect(() => {
@@ -217,24 +207,7 @@ export default function Letter({
             </p>
           </div>
 
-          {/* ── Reply back button ── */}
-          <div className={s.replySection}>
-            <a
-              href={replyLink || 'https://zalo.me'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={s.replyBtn}
-              onClick={handleReplyClick}
-            >
-              <span className={s.replyIcon}>💌</span>
-              <span>Nhắn lại cho anh ngay</span>
-            </a>
-            {copiedToast && (
-              <p className={s.copiedToast}>
-                ✓ Đã sao chép tin nhắn yêu thương! Hãy dán và gửi cho anh nhé 💕
-              </p>
-            )}
-          </div>
+
 
           {/* ── Restart ── */}
           <div className={s.restartRow}>

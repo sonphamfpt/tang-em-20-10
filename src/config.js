@@ -12,11 +12,6 @@ export const config = {
   // Nhạc nền: Mashup "Thiên Lý Ơi x Chờ Chút Thôi x Nơi Này Có Anh"
   musicUrl: '/music.webm',
 
-  // Link liên hệ để người yêu bấm gửi lời nhắn lại (Zalo / Messenger / Facebook)
-  // Bạn có thể đổi số điện thoại Zalo của bạn (ví dụ: 'https://zalo.me/0912345678')
-  // hoặc link Messenger (ví dụ: 'https://m.me/your.username')
-  replyLink: 'https://zalo.me',
-  replyMessage: 'Em đọc thư rồi, cảm ơn anh nhiều lắmmm! Yêu anh ❤️',
 
   // ── SLIDESHOW ẢNH THẬT (Đã bỏ dòng chữ trên ảnh) ───────
   photos: [
