@@ -49,14 +49,14 @@ export default function MusicPlayer({ musicUrl, playing, onToggle }) {
         className={`${s.btn} ${playing ? s.active : ''}`}
         onClick={onToggle}
         aria-label={playing ? 'Tắt nhạc' : 'Bật nhạc'}
-        title={playing ? 'Tắt bài Chờ Chút' : 'Bật bài Chờ Chút'}
+        title={playing ? 'Tắt nhạc (Thiên Lý Ơi x Chờ Chút x Nơi Này Có Anh)' : 'Bật nhạc (Thiên Lý Ơi x Chờ Chút x Nơi Này Có Anh)'}
       >
         <div className={s.eq}>
           <span className={s.bar} />
           <span className={s.bar} />
           <span className={s.bar} />
         </div>
-        <span className={s.label}>{playing ? 'Chờ Chút ♫' : 'Bật nhạc'}</span>
+        <span className={s.label}>{playing ? 'Mashup ♫' : 'Bật nhạc'}</span>
       </button>
     </div>
   );

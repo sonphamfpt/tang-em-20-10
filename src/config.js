@@ -9,7 +9,7 @@ export const config = {
   // Ngày yêu nhau: 24/05/2025
   startDate: '2025-05-24',
 
-  // Nhạc nền: "Chờ chút... - CONGB" ("Chờ anh chút thôi khi mùa đông dần sang")
+  // Nhạc nền: Mashup "Thiên Lý Ơi x Chờ Chút Thôi x Nơi Này Có Anh"
   musicUrl: '/music.webm',
 
   // ── SLIDESHOW ẢNH THẬT (Đã bỏ dòng chữ trên ảnh) ───────
