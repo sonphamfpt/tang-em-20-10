@@ -12,7 +12,7 @@ export default function App() {
   const [step, setStep]           = useState(0);
   const [leaving, setLeaving]     = useState(false);
   const [entering, setEntering]   = useState(false);
-  const [musicPlaying, setMusicPlaying] = useState(false);
+  const [musicPlaying, setMusicPlaying] = useState(true);
   const nextStepRef               = useRef(0);
 
   /* Orchestrate page transition */

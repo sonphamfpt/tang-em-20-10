@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import s from './MusicPlayer.module.css';
 
 function resolveAsset(url) {
@@ -28,19 +28,26 @@ export default function MusicPlayer({ musicUrl, playing, onToggle }) {
     }
 
     if (playing) {
-      const playPromise = audioRef.current.play();
+      const audio = audioRef.current;
+      const playPromise = audio.play();
+
       if (playPromise !== undefined) {
-        playPromise.catch(err => {
-          console.warn('Audio play prevented:', err);
+        playPromise.catch(() => {
+          // Autoplay blocked by browser policy: unlock on the very first touch/click anywhere on page
+          const unlock = () => {
+            if (audioRef.current) {
+              audioRef.current.play().catch(() => {});
+            }
+          };
+          window.addEventListener('touchstart', unlock, { once: true, passive: true });
+          window.addEventListener('click', unlock, { once: true });
         });
       }
     } else {
-      audioRef.current.pause();
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
     }
-
-    return () => {
-      // Don't kill audio on quick re-renders, pause if unmounted
-    };
   }, [playing, musicUrl]);
 
   return (
