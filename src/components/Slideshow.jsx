@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import s from './Slideshow.module.css';
 
 /* Progress bar auto-advances after SLIDE_DUR ms */
-const SLIDE_DUR = 5500;
+const SLIDE_DUR = 5000;
 
 function resolveAsset(url) {
   if (!url) return '';
@@ -20,7 +20,6 @@ export default function Slideshow({ photos, onNext }) {
   const [prev, setPrev]             = useState(null);
   const [dir, setDir]               = useState(1);   // 1 = forward, -1 = back
   const [progress, setProgress]     = useState(0);
-  const [captionIn, setCaptionIn]   = useState(false);
   const [uploadOpen, setUploadOpen] = useState(false);
   const startRef    = useRef(null);
   const rafRef      = useRef(null);
@@ -50,7 +49,6 @@ export default function Slideshow({ photos, onNext }) {
   };
 
   const advance = (d) => {
-    setCaptionIn(false);
     const next = cur + d;
     if (next < 0 || next >= slides.length) {
       if (d === 1) { onNext(); return; }
@@ -63,12 +61,9 @@ export default function Slideshow({ photos, onNext }) {
 
   // Restart progress when cur changes
   useEffect(() => {
-    setCaptionIn(false);
-    const t = setTimeout(() => setCaptionIn(true), 600);
     startProgress();
     return () => {
       cancelAnimationFrame(rafRef.current);
-      clearTimeout(t);
     };
   }, [cur, slides.length]);
 
@@ -77,8 +72,7 @@ export default function Slideshow({ photos, onNext }) {
     const files = Array.from(e.target.files);
     if (!files.length) return;
     const newSlides = files.map(f => ({
-      src:     URL.createObjectURL(f),
-      caption: f.name.replace(/\.[^/.]+$/, ''),
+      src: URL.createObjectURL(f),
     }));
     setSlides(prevSlides => [...newSlides, ...prevSlides]);
     setCur(0);
@@ -109,7 +103,7 @@ export default function Slideshow({ photos, onNext }) {
           key={`cur-${cur}`}
           className={`${s.imgLayer} ${prev !== null ? (dir === 1 ? s.enterRight : s.enterLeft) : s.enterFirst}`}
         >
-          <img src={resolveAsset(slide.src)} alt={slide.caption} className={s.img} />
+          <img src={resolveAsset(slide.src)} alt="" className={s.img} />
           <div className={s.imgScrim} />
         </div>
       )}
@@ -129,16 +123,13 @@ export default function Slideshow({ photos, onNext }) {
       {/* ── Upload button top-left ── */}
       <button className={s.uploadBtn} onClick={() => setUploadOpen(true)}>
         <span className={s.uploadIcon}>+</span>
-        <span className={s.uploadLabel}>Ảnh của em</span>
+        <span className={s.uploadLabel}>Thêm ảnh</span>
       </button>
 
-      {/* ── Caption ── */}
-      {slide && (
-        <div className={`${s.caption} ${captionIn ? s.captionIn : ''}`}>
-          <p className={s.captionText}>{slide.caption}</p>
-          <span className={s.captionSlideNum}>{cur + 1} / {slides.length}</span>
-        </div>
-      )}
+      {/* ── Slide counter indicator (small, subtle at top right below progress) ── */}
+      <div className={s.counterBadge}>
+        {cur + 1} / {slides.length}
+      </div>
 
       {/* ── Nav tap zones ── */}
       <button className={`${s.tapZone} ${s.tapLeft}`}  onClick={() => advance(-1)} aria-label="Ảnh trước" />

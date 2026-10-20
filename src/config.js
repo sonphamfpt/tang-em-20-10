@@ -9,31 +9,17 @@ export const config = {
   // Ngày yêu nhau: 24/05/2025
   startDate: '2025-05-24',
 
-  // Link nhạc nền tuỳ chọn (để '' để dùng chuông nhạc hộp piano có sẵn)
-  musicUrl: '',
+  // Nhạc nền: "Chờ chút... - CONGB" ("Chờ anh chút thôi khi mùa đông dần sang")
+  musicUrl: '/music.webm',
 
-  // ── SLIDESHOW HÀNH TRÌNH YÊU NHAU ─────────────────────
+  // ── SLIDESHOW ẢNH THẬT (Đã bỏ dòng chữ trên ảnh) ───────
   photos: [
-    {
-      src: '/photos/1_first_date.jpg',
-      caption: 'Ngày đầu ngập ngừng hẹn hò nơi góc quán quen ☕',
-    },
-    {
-      src: '/photos/2_rain_umbrella.jpg',
-      caption: 'Cơn mưa rào đầu tiên chúng mình chung một chiếc ô 🌧️',
-    },
-    {
-      src: '/photos/3_sunset_sea.jpg',
-      caption: 'Chuyến đi xa cùng ngắm hoàng hôn buông trên biển 🌅',
-    },
-    {
-      src: '/photos/4_flower_moment.jpg',
-      caption: 'Khoảnh khắc bất ngờ và nụ cười hạnh phúc nhất của em 💐',
-    },
-    {
-      src: '/couple.jpg',
-      caption: 'Và từng ngày trôi qua, anh càng biết ơn vì có em trong đời 💕',
-    },
+    { src: '/photos/real_1.jpg' },
+    { src: '/photos/real_2.jpg' },
+    { src: '/photos/real_3.jpg' },
+    { src: '/photos/real_4.jpg' },
+    { src: '/photos/real_5.jpg' },
+    { src: '/photos/real_6.jpg' },
   ],
 
   // ── BỨC THƯ TÌNH ──────────────────────────────────────
