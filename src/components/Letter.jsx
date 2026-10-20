@@ -11,7 +11,12 @@ function useCounter(startDate) {
     const tick = () => {
       const ms = Math.max(0, Date.now() - start);
       const ss = Math.floor(ms / 1000);
-      setT({ d: Math.floor(ss / 86400), h: Math.floor((ss % 86400) / 3600), m: Math.floor((ss % 3600) / 60), s: ss % 60 });
+      setT({
+        d: Math.floor(ss / 86400),
+        h: Math.floor((ss % 86400) / 3600),
+        m: Math.floor((ss % 3600) / 60),
+        s: ss % 60,
+      });
     };
     tick();
     const id = setInterval(tick, 1000);
@@ -31,7 +36,7 @@ function useTypewriter(lines, active) {
     setPara([]); setDone(false);
     let li = 0, ci = 0, texts = [];
     let prev = 0;
-    const SPEED = 36; // ms per char
+    const SPEED = 34; // ms per char
 
     const tick = (ts) => {
       if (ts - prev < SPEED) { rafRef.current = requestAnimationFrame(tick); return; }
@@ -44,7 +49,7 @@ function useTypewriter(lines, active) {
       if (ci >= line.length) {
         li++; ci = 0;
         if (li < lines.length) texts.push('');
-        prev += 320; // breath between paragraphs
+        prev += 300; // breath between paragraphs
       }
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -55,9 +60,18 @@ function useTypewriter(lines, active) {
   return { para, done };
 }
 
-export default function Letter({ letter, senderName, recipientName, startDate, onRestart }) {
-  const [phase, setPhase] = useState('hidden'); // hidden → scroll → visible
+export default function Letter({
+  letter,
+  senderName,
+  recipientName,
+  startDate,
+  replyLink,
+  replyMessage,
+  onRestart,
+}) {
+  const [phase, setPhase]           = useState('hidden'); // hidden → visible
   const [heartCount, setHeartCount] = useState(0);
+  const [copiedToast, setCopiedToast] = useState(false);
   const counter = useCounter(startDate);
   const { para, done } = useTypewriter(letter, phase === 'visible');
 
@@ -67,38 +81,70 @@ export default function Letter({ letter, senderName, recipientName, startDate, o
     return () => clearTimeout(t1);
   }, []);
 
-  const spawnHearts = (e) => {
-    setHeartCount(n => n + 1);
-    const glyphs = ['💖','💕','✦','❧','♡'];
-    for (let i = 0; i < 5; i++) {
+  // Heart Fireworks Explosion
+  const triggerFireworks = (originX, originY) => {
+    const glyphs = ['💖', '💕', '❤️', '✨', '🌸', '💐', '💓', '💗', '✦'];
+    const count = 32;
+
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + (Math.random() - 0.5) * 0.4;
+      const distance = 90 + Math.random() * 160;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance;
+
       const el = document.createElement('span');
       el.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
-      const dx = (Math.random() - 0.5) * 120;
       el.style.cssText = `
-        position:fixed;
-        left:${e.clientX}px;
-        top:${e.clientY}px;
-        font-size:${18 + Math.random()*14}px;
-        pointer-events:none;
-        z-index:9999;
-        --dx:${dx}px;
-        animation: floatHeart 1.5s ease-out forwards;
-        animation-delay:${i * 60}ms;
+        position: fixed;
+        left: ${originX}px;
+        top: ${originY}px;
+        font-size: ${18 + Math.random() * 16}px;
+        pointer-events: none;
+        z-index: 9999;
+        --tx: ${tx}px;
+        --ty: ${ty}px;
+        animation: heartFirework 1.35s cubic-bezier(0.12, 0.8, 0.32, 1) forwards;
       `;
       document.body.appendChild(el);
-      setTimeout(() => el.remove(), 1600 + i * 60);
+      setTimeout(() => el.remove(), 1400);
     }
   };
 
-  // Inject heart keyframe once
+  const handleHeartClick = (e) => {
+    setHeartCount(n => n + 1);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX || (rect.left + rect.width / 2);
+    const y = e.clientY || (rect.top + rect.height / 2);
+    triggerFireworks(x, y);
+  };
+
+  // Reply handler: copy message + open link
+  const handleReplyClick = (e) => {
+    if (navigator.clipboard && replyMessage) {
+      navigator.clipboard.writeText(replyMessage).catch(() => {});
+    }
+    setCopiedToast(true);
+    setTimeout(() => setCopiedToast(false), 3500);
+  };
+
+  // Inject heart firework keyframe once
   useEffect(() => {
-    if (document.getElementById('fh-kf')) return;
+    if (document.getElementById('hfw-kf')) return;
     const st = document.createElement('style');
-    st.id = 'fh-kf';
-    st.textContent = `@keyframes floatHeart {
-      0%   { opacity:1; transform: translate(-50%,-50%) scale(.5) }
-      50%  { opacity:1; transform: translate(calc(-50% + var(--dx)), -120px) scale(1.2) }
-      100% { opacity:0; transform: translate(calc(-50% + var(--dx)), -200px) scale(.9) }
+    st.id = 'hfw-kf';
+    st.textContent = `@keyframes heartFirework {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.4);
+      }
+      60% {
+        opacity: 1;
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.25);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--tx) * 1.1), calc(-50% + var(--ty) * 1.1 + 40px)) scale(0.7);
+      }
     }`;
     document.head.appendChild(st);
   }, []);
@@ -159,14 +205,33 @@ export default function Letter({ letter, senderName, recipientName, startDate, o
             </div>
           </article>
 
-          {/* ── Heart CTA ── */}
+          {/* ── Heart Fireworks CTA ── */}
           <div className={s.heartSection}>
-            <button className={s.heartBtn} onClick={spawnHearts}>
+            <button className={s.heartBtn} onClick={handleHeartClick} aria-label="Bắn tim pháo hoa">
               <span className={s.heartIcon}>♡</span>
             </button>
-            {heartCount > 0 && (
-              <p className={s.heartNote}>
-                Em đã nhận {heartCount} triệu trái tim từ anh
+            <p className={s.heartNote}>
+              {heartCount > 0
+                ? `Em đã nhận ${heartCount} triệu trái tim từ anh 💖`
+                : 'Chạm vào trái tim để bắn pháo hoa ✨'}
+            </p>
+          </div>
+
+          {/* ── Reply back button ── */}
+          <div className={s.replySection}>
+            <a
+              href={replyLink || 'https://zalo.me'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={s.replyBtn}
+              onClick={handleReplyClick}
+            >
+              <span className={s.replyIcon}>💌</span>
+              <span>Nhắn lại cho anh ngay</span>
+            </a>
+            {copiedToast && (
+              <p className={s.copiedToast}>
+                ✓ Đã sao chép tin nhắn yêu thương! Hãy dán và gửi cho anh nhé 💕
               </p>
             )}
           </div>

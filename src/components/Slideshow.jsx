@@ -21,13 +21,24 @@ export default function Slideshow({ photos, onNext }) {
   const [dir, setDir]               = useState(1);   // 1 = forward, -1 = back
   const [progress, setProgress]     = useState(0);
   const [uploadOpen, setUploadOpen] = useState(false);
-  const startRef    = useRef(null);
-  const rafRef      = useRef(null);
+  const [popHearts, setPopHearts]   = useState([]);
+  const [showHint, setShowHint]     = useState(true);
+
+  const startRef      = useRef(null);
+  const rafRef        = useRef(null);
+  const lastTapRef    = useRef(0);
+  const clickTimerRef = useRef(null);
 
   // Sync slides if photos prop changes
   useEffect(() => {
     setSlides(photos);
   }, [photos]);
+
+  // Hide double tap hint after 4.5 seconds
+  useEffect(() => {
+    const t = setTimeout(() => setShowHint(false), 4500);
+    return () => clearTimeout(t);
+  }, []);
 
   // Animate progress bar
   const startProgress = () => {
@@ -80,6 +91,41 @@ export default function Slideshow({ photos, onNext }) {
     setUploadOpen(false);
   };
 
+  // Handle tap with double-tap detection
+  const handleTap = (d, e) => {
+    const now = Date.now();
+    const DOUBLE_TAP_GAP = 280;
+
+    if (now - lastTapRef.current < DOUBLE_TAP_GAP) {
+      // Double tap detected!
+      if (clickTimerRef.current) {
+        clearTimeout(clickTimerRef.current);
+        clickTimerRef.current = null;
+      }
+      lastTapRef.current = 0;
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clientX = e.clientX ?? (rect.left + rect.width / 2);
+      const clientY = e.clientY ?? (rect.top + rect.height / 2);
+
+      const id = `${now}-${Math.random()}`;
+      setPopHearts(prev => [...prev, { id, x: clientX, y: clientY }]);
+      setTimeout(() => {
+        setPopHearts(prev => prev.filter(h => h.id !== id));
+      }, 1200);
+      return;
+    }
+
+    lastTapRef.current = now;
+    clickTimerRef.current = setTimeout(() => {
+      if (d === 1 && isLast) {
+        onNext();
+      } else {
+        advance(d);
+      }
+    }, DOUBLE_TAP_GAP);
+  };
+
   const isLast = cur === slides.length - 1;
   const slide  = slides[cur] || slides[0];
 
@@ -126,14 +172,42 @@ export default function Slideshow({ photos, onNext }) {
         <span className={s.uploadLabel}>Thêm ảnh</span>
       </button>
 
-      {/* ── Slide counter indicator (small, subtle at top right below progress) ── */}
+      {/* ── Slide counter indicator ── */}
       <div className={s.counterBadge}>
         {cur + 1} / {slides.length}
       </div>
 
-      {/* ── Nav tap zones ── */}
-      <button className={`${s.tapZone} ${s.tapLeft}`}  onClick={() => advance(-1)} aria-label="Ảnh trước" />
-      <button className={`${s.tapZone} ${s.tapRight}`} onClick={() => isLast ? onNext() : advance(1)} aria-label="Ảnh tiếp" />
+      {/* ── Double-tap popping hearts overlay ── */}
+      {popHearts.map(h => (
+        <div
+          key={h.id}
+          className={s.popHeart}
+          style={{ left: `${h.x}px`, top: `${h.y}px` }}
+        >
+          <span className={s.popHeartIcon}>💖</span>
+          <span className={s.popSparkle1}>✨</span>
+          <span className={s.popSparkle2}>💕</span>
+        </div>
+      ))}
+
+      {/* ── Double tap hint ── */}
+      {showHint && (
+        <div className={s.hintToast}>
+          Chạm 2 lần để thả tim ảnh 💕
+        </div>
+      )}
+
+      {/* ── Nav tap zones with double-tap support ── */}
+      <button
+        className={`${s.tapZone} ${s.tapLeft}`}
+        onClick={(e) => handleTap(-1, e)}
+        aria-label="Ảnh trước"
+      />
+      <button
+        className={`${s.tapZone} ${s.tapRight}`}
+        onClick={(e) => handleTap(1, e)}
+        aria-label="Ảnh tiếp"
+      />
 
       {/* ── Swipe hint arrows ── */}
       <div className={s.arrows}>

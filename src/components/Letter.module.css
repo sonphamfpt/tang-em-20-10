@@ -285,12 +285,66 @@
   font-family: var(--ff-serif);
   font-style: italic;
   font-size: 14px;
-  color: rgba(240,200,210,0.55);
+  color: rgba(240,200,210,0.65);
   text-align: center;
   animation: fadeInNote 0.5s ease;
 }
 
 @keyframes fadeInNote { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+
+/* ── Reply section ────────────────────────────────── */
+.replySection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: -6px;
+}
+
+.replyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 28px;
+  background: linear-gradient(135deg, rgba(232,99,122,0.2) 0%, rgba(194,64,90,0.3) 100%);
+  border: 1px solid rgba(232,99,122,0.45);
+  border-radius: 999px;
+  color: #fff;
+  font-family: var(--ff-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(194,64,90,0.25);
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1);
+  cursor: pointer;
+}
+
+.replyBtn:hover {
+  background: linear-gradient(135deg, rgba(232,99,122,0.35) 0%, rgba(194,64,90,0.45) 100%);
+  box-shadow: 0 6px 28px rgba(232,99,122,0.4);
+  transform: translateY(-2px);
+}
+
+.replyBtn:active {
+  transform: scale(0.96);
+}
+
+.replyIcon {
+  font-size: 16px;
+}
+
+.copiedToast {
+  font-family: var(--ff-sans);
+  font-size: 11px;
+  color: #f2a0ae;
+  background: rgba(40,16,28,0.7);
+  border: 1px solid rgba(232,99,122,0.3);
+  padding: 6px 14px;
+  border-radius: 999px;
+  text-align: center;
+  animation: fadeInNote 0.3s ease;
+}
 
 /* ── Restart ──────────────────────────────────────── */
 .restartRow { display: flex; justify-content: center; }

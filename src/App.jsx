@@ -80,6 +80,8 @@ export default function App() {
             senderName={config.senderName}
             recipientName={config.recipientName}
             startDate={config.startDate}
+            replyLink={config.replyLink}
+            replyMessage={config.replyMessage}
             onRestart={restart}
           />
         )}
