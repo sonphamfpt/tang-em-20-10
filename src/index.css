@@ -1,0 +1,100 @@
+/* =============================================
+   GLOBAL RESET & CSS CUSTOM PROPERTIES
+   ============================================= */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:root {
+  --pink-50:  #fff0f3;
+  --pink-100: #ffe0e8;
+  --pink-200: #ffb3c6;
+  --pink-300: #ff8fa3;
+  --pink-400: #ff4d6d;
+  --pink-500: #e5304f;
+  --pink-600: #c9184a;
+  --pink-700: #a4133c;
+
+  --warm-white: #fffaf8;
+  --cream: #fdf4ee;
+  --text-dark: #1c0f16;
+  --text-mid:  #5c3045;
+  --text-light: #9b7485;
+
+  --gold: #f4c542;
+  --gold-light: #fde87a;
+
+  --surface: rgba(255,255,255,0.07);
+  --border:  rgba(255,255,255,0.14);
+
+  --font-body:    'Be Vietnam Pro', sans-serif;
+  --font-display: 'Playfair Display', serif;
+  --font-script:  'Dancing Script', cursive;
+
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  font-family: var(--font-body);
+  background: #120a14;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--pink-600); border-radius: 4px; }
+
+button { font-family: var(--font-body); cursor: pointer; border: none; outline: none; }
+img { display: block; max-width: 100%; }
+
+/* =============================================
+   SHARED UTILITY CLASSES
+   ============================================= */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Animated gradient background */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%,   rgba(201,24,74,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 80% 100%, rgba(229,48,79,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 90% 80% at 50% 50%,  rgba(18,10,20,1) 0%, #0d060f 100%);
+  pointer-events: none;
+}
+
+/* Particle canvas */
+#particle-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Layout wrapper */
+.app-shell {
+  position: relative;
+  z-index: 10;
+  min-height: 100dvh;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
