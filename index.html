@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gửi Người Anh Yêu ❤️ Chúc Mừng 20/10</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💌</text></svg>">
+
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Great+Vibes&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Canvas for Falling Sakura & Sparkling Hearts -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Music Control Float -->
+    <div class="music-toggle" id="musicToggle" title="Bật/Tắt nhạc">
+        <div class="music-icon-disc" id="musicDisc">
+            <span class="music-emoji">🎵</span>
+        </div>
+        <span class="music-label" id="musicLabel">Phát nhạc</span>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="app-container">
+
+        <!-- ================= STAGE 1: ENVELOPE INTRO ================= -->
+        <section class="envelope-screen" id="envelopeScreen">
+            <div class="envelope-wrapper" id="envelopeWrapper">
+                <!-- Floating glowing tags around envelope -->
+                <div class="floating-bubble bubble-1">💐 20/10 Vui Vẻ</div>
+                <div class="floating-bubble bubble-2">💖 Yêu Em Nhiều</div>
+                <div class="floating-bubble bubble-3">✨ Luôn Xinh Đẹp</div>
+
+                <!-- 3D Envelope -->
+                <div class="envelope" id="envelope">
+                    <div class="envelope-back"></div>
+                    <div class="envelope-paper-preview">
+                        <div class="paper-line short"></div>
+                        <div class="paper-line"></div>
+                        <div class="paper-line medium"></div>
+                        <span class="mini-rose">🌹</span>
+                    </div>
+                    <div class="envelope-pocket"></div>
+                    <div class="envelope-flap" id="envelopeFlap"></div>
+                    <div class="wax-seal" id="waxSeal">
+                        <div class="seal-inner">
+                            <span>❤️</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="envelope-hint">
+                    <p class="hint-subtitle" id="introRecipientTag">Gửi công chúa nhỏ của anh</p>
+                    <h2 class="hint-title">Chạm vào phong thư để mở quà ✨</h2>
+                    <div class="pulse-indicator">
+                        <div class="finger-tap">👆</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= STAGE 2: CELEBRATION & LETTER ================= -->
+        <section class="content-screen hidden" id="contentScreen">
+            
+            <!-- Hero Badge -->
+            <header class="hero-header">
+                <div class="badge-pill" id="badgeTitle">✨ Happy Vietnamese Women's Day 20/10 ✨</div>
+                <h1 class="celebration-title" id="mainHeading">Chúc Mừng Ngày 20/10!</h1>
+                <p class="celebration-subtitle">Dành riêng cho cô gái anh yêu nhất trên đời</p>
+            </header>
+
+            <!-- Polaroid Photo Frame -->
+            <div class="polaroid-wrapper">
+                <div class="polaroid-card" id="polaroidCard">
+                    <div class="washi-tape"></div>
+                    <div class="polaroid-img-box">
+                        <img id="loverPhoto" src="assets/couple.jpg" alt="Khoảnh khắc ngọt ngào" />
+                        <div class="photo-shine"></div>
+                    </div>
+                    <div class="polaroid-caption">
+                        <span class="caption-handwriting" id="photoCaption">Khoảnh khắc ngọt ngào bên em 💕</span>
+                        <div class="sticker-heart">💖</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Love Days Counter Card -->
+            <div class="counter-card" id="counterCard">
+                <div class="counter-header">
+                    <span class="counter-icon">⏳</span>
+                    <span class="counter-title">Chúng mình đã bên nhau</span>
+                </div>
+                <div class="counter-grid">
+                    <div class="counter-item">
+                        <span class="counter-num" id="daysCount">0</span>
+                        <span class="counter-unit">Ngày</span>
+                    </div>
+                    <div class="counter-item">
+                        <span class="counter-num" id="hoursCount">0</span>
+                        <span class="counter-unit">Giờ</span>
+                    </div>
+                    <div class="counter-item">
+                        <span class="counter-num" id="minutesCount">0</span>
+                        <span class="counter-unit">Phút</span>
+                    </div>
+                    <div class="counter-item">
+                        <span class="counter-num" id="secondsCount">0</span>
+                        <span class="counter-unit">Giây</span>
+                    </div>
+                </div>
+                <p class="counter-footer">Mỗi giây phút đều là một món quà vô giá ✨</p>
+            </div>
+
+            <!-- Romantic Letter Scroll -->
+            <article class="letter-card">
+                <div class="letter-watermark">LOVE</div>
+                <div class="letter-inner">
+                    <div class="letter-salutation">
+                        <span>Gửi</span>
+                        <h2 class="recipient-name" id="letterRecipient">Em Yêu Của Anh</h2>
+                        <span class="heart-emoji">💌</span>
+                    </div>
+
+                    <!-- Typewriter Text Container -->
+                    <div class="letter-body" id="letterBody">
+                        <!-- Paragraphs typed dynamically by script.js -->
+                    </div>
+
+                    <div class="letter-signature">
+                        <p class="sig-note">Mãi yêu thương & chở che cho em,</p>
+                        <h3 class="sig-name" id="senderSignature">Anh yêu của em ❤️</h3>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Interactive Surprise Vouchers / Gifts -->
+            <section class="vouchers-section">
+                <div class="section-title-wrap">
+                    <span class="sec-badge">QUÀ TẶNG BẤT NGỜ</span>
+                    <h2 class="sec-title">Hộp Phiếu Yêu Thương Dành Cho Em</h2>
+                    <p class="sec-sub">Chạm vào từng phiếu để "kích hoạt" đặc quyền của em nhé!</p>
+                </div>
+
+                <div class="vouchers-grid" id="vouchersGrid">
+                    <!-- Injected dynamically from config.js -->
+                </div>
+            </section>
+
+            <!-- Interactive Love Spreader Button -->
+            <section class="love-bomb-section">
+                <div class="love-bomb-card">
+                    <h3>Gửi ngàn nụ hôn và trái tim</h3>
+                    <p>Chạm vào nút để gửi tình cảm đến anh nào!</p>
+                    <button class="btn-love-bomb" id="btnLoveBomb">
+                        <span class="heart-pulse">💖</span>
+                        <span>Bắn Tim Yêu Thương!</span>
+                    </button>
+                    <div class="love-tally">
+                        Đã gửi: <strong id="heartTally">0</strong> triệu trái tim đong đầy 💕
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer Message -->
+            <footer class="app-footer">
+                <div class="footer-roses">🌹 🌷 🌸 🌺 💐</div>
+                <p class="footer-text">Thiết kế bằng cả trái tim dành cho em ngày 20/10</p>
+                <div class="reopen-link">
+                    <button id="btnReopen" class="btn-ghost">💌 Mở lại thư từ đầu</button>
+                </div>
+            </footer>
+
+        </section>
+
+    </main>
+
+    <!-- Modal for Activated Voucher -->
+    <div class="voucher-modal hidden" id="voucherModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <div class="modal-confetti-sparkle">🎉</div>
+            <div class="modal-icon" id="modalIcon">👑</div>
+            <h3 class="modal-title" id="modalTitle">Vé Đặc Quyền</h3>
+            <p class="modal-desc" id="modalDesc">Mô tả đặc quyền</p>
+            <div class="modal-stamp">ĐÃ KÍCH HOẠT VĨNH VIỄN ✔️</div>
+            <div class="modal-code">Mã: <code id="modalCode">LOVE-VIP</code></div>
+            <button class="btn-modal-close" id="btnModalClose">Em nhận phiếu này nha! 🥰</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
